@@ -6,7 +6,7 @@ Trained weights: https://drive.google.com/file/d/1-08B65Zc-djIUWVJpJ_HPt2cuaCnKC
 
 
 ## Table of Content
-* Cat_Doven_Detection.py.py
+* Cat_Doven_Detection.py
 
 ### Demo of video detection:
 
