@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import os
 
 
 net = net = cv.dnn.readNet('weights/yolov3_training_final.weights', 'weights/yolov3_testing.cfg')
@@ -14,6 +15,21 @@ def predict_img(img_file_path):
     layerOutputs = net.forward(output_layers_names)  # compute forward and get out put from output layer
     # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1
     return layerOutputs, height, width, img
+
+
+def predict_video(video_img):
+    # img = cv.imread(video_img)
+    _, img = video_img.read()
+    if img is not None:
+        height, width, _ = img.shape
+        blob = cv.dnn.blobFromImage(img, 1 / 255, (416, 416), swapRB=True)
+        net.setInput(blob)
+        output_layers_names = net.getUnconnectedOutLayersNames()  # get output layers' names
+        layerOutputs = net.forward(output_layers_names)  # compute forward and get out put from output layer
+        # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1
+        return layerOutputs, height, width, img
+    else:
+        return False
 
 
 def generate_bounding_box(layeroutputs, height, width, img):
@@ -61,7 +77,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
     return img
 
 
-def detect(image_file):
+def detect_img(image_file):
     for img in image_file:
         layerOutputs, height, width, img = predict_img(img)
         img_pred = generate_bounding_box(layerOutputs, height, width, img)
@@ -72,6 +88,44 @@ def detect(image_file):
     cv.destroyAllWindows()
 
 
+def detect_video(video_file,method='video'):
+    if method == 'video':
+        for video in video_file:
+            cap = cv.VideoCapture(video)
+            while True and cap !=None:
+                if predict_video(cap) != False:
+                    layerOutputs, height, width, img = predict_video(cap)
+                    img_pred = generate_bounding_box(layerOutputs, height, width, img)
+                    cv.imshow('Video', img_pred)
+                    key = cv.waitKey(1)
+                    if key == 27:
+                        break
+                else:
+
+                    cv.destroyAllWindows()
+                    break
+
+    elif method == 'webcam':
+        cap = cv.VideoCapture(0)
+        while True:
+            layerOutputs, height, width, img = predict_video(cap)
+            img_pred = generate_bounding_box(layerOutputs, height, width, img)
+            cv.imshow('Video', img_pred)
+            key = cv.waitKey(1)
+            if key == 27:
+                break
+
+    cap.release()
+    cv.destroyAllWindows()
+
+
 if __name__ == '__main__':
-    img_file = ['data/doven1.jpeg', 'data/doven2.jpeg', 'data/doven3.jpeg', 'data/dog1.jpeg']
-    detect(img_file)
+    img_file = []
+    path = "data/"
+    path_list = os.listdir(path)
+    for filename in path_list:
+        if os.path.splitext(filename)[1] != '.txt':
+            img_file.append(os.path.join(path, filename))
+    detect_img(img_file)
+
+    # detect_video(['data/1603861449844338.mp4'],method='webcam')
