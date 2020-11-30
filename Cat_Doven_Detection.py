@@ -46,7 +46,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.5:  # score threshold
+            if confidence > 0.9:  # score threshold
                 print(scores)
                 # get the center and resize back to original size
                 center_x = int(detection[0] * width)
@@ -60,7 +60,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
                 confidences.append((float(confidence)))
                 class_ids.append(class_id)
     # get rid of redundant box bu Non-max surpass
-    indexes = cv.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+    indexes = cv.dnn.NMSBoxes(boxes, confidences, 0.9, 0.4)
     font = cv.FONT_HERSHEY_PLAIN  # select a font
     colors = np.random.uniform(0, 255, size=(len(boxes), 3))  # select a color
     if len(indexes) > 0:
@@ -120,15 +120,12 @@ def detect_video(video_file,method='video'):
                 cv.destroyAllWindows()
 
 
-
 if __name__ == '__main__':
     img_file = []
     path = "data/"
     path_list = os.listdir(path)
     for filename in path_list:
-        if os.path.splitext(filename)[1] != '.txt':
+        if os.path.splitext(filename)[1] == '.jpeg':
             img_file.append(os.path.join(path, filename))
-    # detect_img(img_file)
-
-    detect_video(['data/cat_doven_video.mp4'],method='video')
-    # detect_video(['data/cat_doven_video.mp4'], method='webcam')
+    detect_img(img_file)
+    # detect_video(['data/cat_doven_video.mp4'],method='video')
