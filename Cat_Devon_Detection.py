@@ -83,7 +83,7 @@ def detect_img(image_file):
     for img in image_file:
         layerOutputs, height, width, img = predict_img(img)
         img_pred = generate_bounding_box(layerOutputs, height, width, img)
-        cv.imshow('Cat_Doven', img_pred)
+        cv.imshow('Cat_Devon', img_pred)
         cv.waitKey(0)
         cv.destroyAllWindows()
     cv.waitKey(0)
