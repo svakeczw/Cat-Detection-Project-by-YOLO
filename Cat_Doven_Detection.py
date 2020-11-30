@@ -18,18 +18,21 @@ def predict_img(img_file_path):
 
 
 def predict_video(video_img):
-    # img = cv.imread(video_img)
     _, img = video_img.read()
-    if img is not None:
+    has_img = True
+    try:
+        height, width, _ = img.shape
+    except:
+        has_img = False
+        return _, _, _, _, has_img
+    else:
         height, width, _ = img.shape
         blob = cv.dnn.blobFromImage(img, 1 / 255, (416, 416), swapRB=True)
         net.setInput(blob)
         output_layers_names = net.getUnconnectedOutLayersNames()  # get output layers' names
         layerOutputs = net.forward(output_layers_names)  # compute forward and get out put from output layer
         # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1
-        return layerOutputs, height, width, img
-    else:
-        return False
+        return layerOutputs, height, width, img, has_img
 
 
 def generate_bounding_box(layeroutputs, height, width, img):
@@ -44,7 +47,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.9:  # score threshold
+            if confidence > 0.5:  # score threshold
                 print(scores)
                 # get the center and resize back to original size
                 center_x = int(detection[0] * width)
@@ -58,7 +61,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
                 confidences.append((float(confidence)))
                 class_ids.append(class_id)
     # get rid of redundant box bu Non-max surpass
-    indexes = cv.dnn.NMSBoxes(boxes, confidences, 0.9, 0.4)
+    indexes = cv.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
     font = cv.FONT_HERSHEY_PLAIN  # select a font
     colors = np.random.uniform(0, 255, size=(len(boxes), 3))  # select a color
     if len(indexes) > 0:
@@ -92,18 +95,19 @@ def detect_video(video_file,method='video'):
     if method == 'video':
         for video in video_file:
             cap = cv.VideoCapture(video)
-            while True and cap !=None:
-                if predict_video(cap) != False:
-                    layerOutputs, height, width, img = predict_video(cap)
+            while cap:
+                # if predict_video(cap) != False:
+                layerOutputs, height, width, img, has_img = predict_video(cap)
+                if has_img:
                     img_pred = generate_bounding_box(layerOutputs, height, width, img)
                     cv.imshow('Video', img_pred)
                     key = cv.waitKey(1)
                     if key == 27:
-                        break
+                        cap.release()
+                        cv.destroyAllWindows()
                 else:
-
+                    cv.waitKey()
                     cv.destroyAllWindows()
-                    break
 
     elif method == 'webcam':
         cap = cv.VideoCapture(0)
@@ -126,7 +130,6 @@ if __name__ == '__main__':
     for filename in path_list:
         if os.path.splitext(filename)[1] != '.txt':
             img_file.append(os.path.join(path, filename))
-    detect_img(img_file)
+    # detect_img(img_file)
 
-    # detect_video(['data/cat_doven_video.mp4'],method='video')
-    # https: // www.pexels.com / photo / brown - and -white - short - coated - puppy - 1805164 /
+    detect_video(['data/591638.MOV'],method='video')
