@@ -13,7 +13,7 @@ def predict_img(img_file_path):
     net.setInput(blob)
     output_layers_names = net.getUnconnectedOutLayersNames()  # get output layers' names
     layerOutputs = net.forward(output_layers_names)  # compute forward and get out put from output layer
-    # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1
+    # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1 label
     return layerOutputs, height, width, img
 
 
@@ -26,12 +26,11 @@ def predict_video(video_img):
         has_img = False
         return _, _, _, _, has_img
     else:
-        height, width, _ = img.shape
         blob = cv.dnn.blobFromImage(img, 1 / 255, (416, 416), swapRB=True)
         net.setInput(blob)
         output_layers_names = net.getUnconnectedOutLayersNames()  # get output layers' names
         layerOutputs = net.forward(output_layers_names)  # compute forward and get out put from output layer
-        # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1
+        # print(layerOutputs)  # 4 bounding boxes, 1 box confidence score, 1 label
         return layerOutputs, height, width, img, has_img
 
 
@@ -74,7 +73,7 @@ def generate_bounding_box(layeroutputs, height, width, img):
             text = label + " " + confidence
             cv.putText(img, text=text, org=(x, y), fontFace=font, fontScale=2, color=color, thickness=2)
     else:
-        text = 'None cat doven detected!'
+        text = 'None target object detected!'
         color = np.random.uniform(0, 255, size=(1, 3)).flatten()
         cv.putText(img, text,(int(width/2), int(height/2 + 20)), fontFace=font, fontScale=2, color=color, thickness=3)
     return img
@@ -111,16 +110,15 @@ def detect_video(video_file,method='video'):
 
     elif method == 'webcam':
         cap = cv.VideoCapture(0)
-        while True:
-            layerOutputs, height, width, img = predict_video(cap)
+        while cap:
+            layerOutputs, height, width, img, _ = predict_video(cap)
             img_pred = generate_bounding_box(layerOutputs, height, width, img)
             cv.imshow('Video', img_pred)
             key = cv.waitKey(1)
             if key == 27:
-                break
+                cap.release()
+                cv.destroyAllWindows()
 
-    cap.release()
-    cv.destroyAllWindows()
 
 
 if __name__ == '__main__':
@@ -132,4 +130,5 @@ if __name__ == '__main__':
             img_file.append(os.path.join(path, filename))
     # detect_img(img_file)
 
-    detect_video(['data/591638.MOV'],method='video')
+    detect_video(['data/cat_doven_video.mp4'],method='video')
+    # detect_video(['data/cat_doven_video.mp4'], method='webcam')
