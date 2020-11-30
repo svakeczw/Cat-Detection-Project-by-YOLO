@@ -18,12 +18,14 @@ My friend has a cat recently, and it is a Devon Rex. I learnt a CV algorithm, an
 
 -> demo pictures and video
 
-### Demo of video detection:
+### Demo of image detection:
 ![pic detection test](test/dog1_test.png "pic detection test")
 ![pic detection test](test/devon1_test.png "pic detection test")
 
 ![pic detection test](test/devon2_test.png "pic detection test")
 ![pic detection test](test/devon3_test.png "pic detection test")
+
+### Demo of video detection:
 ![video detection test](test/video_detection.gif "video detection test")
 
 ## Reference:
