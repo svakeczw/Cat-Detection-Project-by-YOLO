@@ -128,4 +128,5 @@ if __name__ == '__main__':
             img_file.append(os.path.join(path, filename))
     detect_img(img_file)
 
-    # detect_video(['data/1603861449844338.mp4'],method='webcam')
+    # detect_video(['data/cat_doven_video.mp4'],method='video')
+    # https: // www.pexels.com / photo / brown - and -white - short - coated - puppy - 1805164 /
