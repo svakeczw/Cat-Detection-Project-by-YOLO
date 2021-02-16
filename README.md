@@ -1,7 +1,7 @@
 # Cat-Detection-Project-by-YOLO
 [![standard-readme compliant](https://img.shields.io/badge/Powered%20by-YOLOv4-green)](https://github.com/AlexeyAB/darknet)
 ## Introduction
-This reposity is to use YOLO and darknet framework to train a model for object detection.
+The project in this reposity is to use YOLO and darknet framework to train a model for object detection.
 
 Find trained weights: https://drive.google.com/file/d/1-08B65Zc-djIUWVJpJ_HPt2cuaCnKCPF/view?usp=sharing
 ## The story
